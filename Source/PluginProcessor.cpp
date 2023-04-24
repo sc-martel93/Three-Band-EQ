@@ -96,35 +96,45 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 
+    // Create a new ProcessSpec object to specify the processing parameters
     juce::dsp::ProcessSpec spec;
 
+    // Set the maximum block size to the given samplesPerBlock value
     spec.maximumBlockSize = samplesPerBlock;
 
+    // Set the number of channels to 1 (mono)
     spec.numChannels = 1;
 
+    // Set the sample rate to the given value
     spec.sampleRate = sampleRate;
 
+    // Prepare the left and right processing chains with the specified processing spec
     leftChain.prepare(spec);
     rightChain.prepare(spec);
 
+    // Get the current chain settings from the AudioProcessorValueTreeState (apvts) object
     auto chainSettings = getChainSettings(apvts);
     
+    // Update the peak filter parameters based on the current chain settings.
     updatePeakFilter(chainSettings);
 
+    // Design a high-pass filter using the Butterworth method, with the cut-off frequency and slope
+    // specified in the current chain settings.
     auto cutCoeffecients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(chainSettings.lowCutFreq, 
                                                                                                         sampleRate, 
                                                                                                         2 * (chainSettings.lowCutSlope + 1));
-
-    // Initialize the left chain
+    
+    // Get a reference to the low-cut filter in the left channel's processing chain
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
 
-    // Bypass all links in the chain, 4 positions
+    // Bypass the low-cut filter on each of its 4 available frequency bands
     leftLowCut.setBypassed<0>(true);
     leftLowCut.setBypassed<1>(true);
     leftLowCut.setBypassed<2>(true);
     leftLowCut.setBypassed<3>(true);
 
-    //
+    // Set the coefficients of the high-pass filter for the left processing chain,
+   // based on the cut-off frequency and slope specified in the current chain settings.
     switch (chainSettings.lowCutSlope)
     {
     case Slope_12:
@@ -167,9 +177,10 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
         break;
     }
 
+    // Get a reference to the low-cut filter in the right channel's processing chain
     auto& rightLowCut = rightChain.get<ChainPositions::LowCut>();
 
-    // Bypass all links in the chain, 4 positions
+    // Bypass the low-cut filter on each of its 4 available frequency bands
     rightLowCut.setBypassed<0>(true);
     rightLowCut.setBypassed<1>(true);
     rightLowCut.setBypassed<2>(true);
@@ -282,7 +293,6 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     leftLowCut.setBypassed<2>(true);
     leftLowCut.setBypassed<3>(true);
 
-    //
     switch (chainSettings.lowCutSlope)
     {
     case Slope_12:
