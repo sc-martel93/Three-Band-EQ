@@ -35,6 +35,21 @@ SimpleEQAudioProcessorEditor::~SimpleEQAudioProcessorEditor()
 {
 }
 
+void SimpleEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, float newValue)
+{
+    parametersChanged.set(true);
+}
+
+void SimpleEQAudioProcessorEditor::timerCallback()
+{
+    if (parametersChanged.compareAndSetBool(false, true))
+    {
+        // Update the monochain
+        // Signal a repaint
+
+    }
+}
+
 //==============================================================================
 void SimpleEQAudioProcessorEditor::paint (juce::Graphics& g)
 {   
