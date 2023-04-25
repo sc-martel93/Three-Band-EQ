@@ -310,7 +310,7 @@ void SimpleEQAudioProcessor::updateLowCutFilters(const ChainSettings& chainSetti
 {
     // Design a high-pass filter using the Butterworth method, with the cut-off frequency and slope
     // specified in the current chain settings.
-    auto lowCutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(chainSettings.lowCutFreq, getSampleRate(), 2 * (chainSettings.lowCutSlope + 1));
+    auto lowCutCoefficients = makeLowCutFilter(chainSettings, getSampleRate());
 
     // Get a reference to the low-cut filter for left and right channel's processing chain and update
     auto& leftLowCut = leftChain.get<ChainPositions::LowCut>();
@@ -323,7 +323,7 @@ void SimpleEQAudioProcessor::updateLowCutFilters(const ChainSettings& chainSetti
 void SimpleEQAudioProcessor::updateHighCutFilters(const ChainSettings& chainSettings)
 {
     // Create a high cut filter coefficient for a given frequency and sample rate
-    auto highCutCoefficients = juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(chainSettings.highCutFreq, getSampleRate(), 2 * (chainSettings.highCutSlope + 1));
+    auto highCutCoefficients = makeHighCutFilter(chainSettings, getSampleRate());
 
     // Get the left chain high cut filter for left and right channel's and update its coefficients based on chain settings
     auto& leftHighCut = leftChain.get<ChainPositions::HighCut>();
