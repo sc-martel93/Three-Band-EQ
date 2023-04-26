@@ -87,11 +87,12 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto range = getRange();
 
     auto sliderBounds = getSliderBounds();
-
-    g.setColour(Colours::red);
+    
+    // Bounding boxes for sliders
+   /* g.setColour(Colours::red);
     g.drawRect(getLocalBounds());
     g.setColour(Colours::yellow);
-    g.drawRect(sliderBounds);
+    g.drawRect(sliderBounds);*/
 
     getLookAndFeel().drawRotarySlider(g, 
                                         sliderBounds.getX(), 
@@ -121,7 +122,42 @@ juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 
 juce::String RotarySliderWithLabels::getDisplayString() const
 {
-    return juce::String(getValue());
+    if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(param))
+        return choiceParam->getCurrentChoiceName();
+
+    juce::String str;
+    bool addK = false;
+
+    if (auto* floatParam = dynamic_cast<juce::AudioParameterFloat*>(param))
+    {
+        float val = getValue();
+
+        // Display kHz when over 1000
+        if (val > 999.f)
+        {
+            val /= 1000.f;
+            addK = true;
+        }
+
+        // Set 2 decimal places if over 1000 (kHz)
+        str = juce::String(val, (addK ? 2 : 0));
+    }
+    else
+    {
+        jassertfalse;
+    }
+
+    if (suffix.isNotEmpty())
+    {
+        str << " ";
+
+        if (addK)
+            str << "k";
+
+        str << suffix;
+    }
+
+    return str;
 }
 
 //==============================================================================
