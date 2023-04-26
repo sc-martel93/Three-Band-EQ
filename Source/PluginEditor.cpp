@@ -433,6 +433,17 @@ void ResponseCurveComponent::resized()
         // TODO: Update this color
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::lightgrey);
         g.drawFittedText(str, r, Justification::centred, 1);
+
+        // Draw analyzer decibel marks
+        str.clear();
+        str << (gDb - 24.f);
+        
+        // Set bounding box to left side
+        r.setX(1);
+        textWidth = g.getCurrentFont().getStringWidth(str);
+        r.setSize(textWidth, fontHeight);
+        g.setColour(Colours::lightgrey);
+        g.drawFittedText(str, r, juce::Justification::centred, 1);
     }
 
 }
@@ -442,7 +453,6 @@ juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
     auto bounds = getLocalBounds();
 
     // Reduce bounds to allow room to label response curve grid
-    // bounds.reduce(8, 10);
     bounds.removeFromTop(12);
     bounds.removeFromBottom(2);
     bounds.removeFromLeft(20);
