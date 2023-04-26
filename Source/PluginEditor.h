@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+// Look and Feel
 struct LookAndFeel : juce::LookAndFeel_V4
 {
     void drawRotarySlider(juce::Graphics&,
@@ -21,6 +22,7 @@ struct LookAndFeel : juce::LookAndFeel_V4
         juce::Slider&) override;
 };
 
+// Rotary Slider With Labels
 struct RotarySliderWithLabels : juce::Slider
 {
     RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix) :
@@ -57,6 +59,7 @@ private:
     juce::String suffix;
 };
 
+// Response Curve Component
 struct ResponseCurveComponent : juce::Component,
     juce::AudioProcessorParameter::Listener,
     juce::Timer
@@ -77,6 +80,8 @@ private:
     juce::Atomic<bool> parametersChanged{ false };
 
     MonoChain monoChain;
+
+    void updateChain();
 };
 
 //==============================================================================
