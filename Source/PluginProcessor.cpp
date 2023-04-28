@@ -114,6 +114,10 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
     // Update low, peak, and high cut filters
     updateFilters();
+    
+    // Prepare fifos
+    leftChannelFifo.prepare(samplesPerBlock);
+    rightChannelFifo.prepare(samplesPerBlock);
 }
 
 void SimpleEQAudioProcessor::releaseResources()
@@ -177,6 +181,10 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     // Pass context to the mono filter chain
     leftChain.process(leftContext);
     rightChain.process(rightContext);
+    
+    // Update fifos
+    leftChannelFifo.update(buffer);
+    rightChannelFifo.update(buffer);
 
 }
 
