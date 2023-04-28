@@ -191,7 +191,9 @@ juce::String RotarySliderWithLabels::getDisplayString() const
 }
 
 //==============================================================================
-ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audioProcessor(p)
+ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) :
+    audioProcessor(p),
+    leftChannelFifo(&audioProcessor.leftChannelFifo)
 {
     // Register as listener to params
     const auto& params = audioProcessor.getParameters();
@@ -200,7 +202,14 @@ ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) : audi
     {
         param->addListener(this);
     }
-
+    
+    /*
+     48000 / 2048 = 23hz per bin
+     */
+    
+    leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
+    monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
+    
     updateChain();
 
     startTimerHz(60); 
@@ -224,6 +233,28 @@ void ResponseCurveComponent::parameterValueChanged(int parameterIndex, float new
 
 void ResponseCurveComponent::timerCallback()
 {
+    juce::AudioBuffer<float> tempIncomingBuffer;
+    
+    while (leftChannelFifo->getNumCompleteBuffersAvailable() > 0 )
+    {
+        if (leftChannelFifo->getAudioBuffer(tempIncomingBuffer))
+        {
+            // Shift everything in monbuffer forward by however many samples incoming
+            auto size = tempIncomingBuffer.getNumSamples();
+            
+            juce::FloatVectorOperations::copy(monoBuffer.getWritePointer(0, 0),
+                                              monoBuffer.getReadPointer(0, size),
+                                              monoBuffer.getNumSamples() - size);
+            
+            // Copy all samples from temp buffer to end of mono buffer
+            juce::FloatVectorOperations::copy(monoBuffer.getWritePointer(0, monoBuffer.getNumSamples() - size),
+                                              tempIncomingBuffer.getReadPointer(0, 0),
+                                              size);
+            
+            leftChannelFFTDataGenerator.produceFFTDataForRendering(monoBuffer, -48.f);
+        }
+    }
+    
     if (parametersChanged.compareAndSetBool(false, true))
     {
         // Update the monochain
