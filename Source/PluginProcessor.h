@@ -11,6 +11,8 @@
 #include <JuceHeader.h>
 
 #include <array>
+
+//==============================================================================
 template<typename T>
 struct Fifo
 {
@@ -80,6 +82,7 @@ enum Channel
     Left // Efectively 1
 };
 
+//==============================================================================
 template<typename BlockType>
 struct SingleChannelSampleFifo
 {
@@ -144,6 +147,7 @@ private:
     }
 };
 
+//==============================================================================
 enum Slope
 {
     Slope_12,
@@ -152,6 +156,7 @@ enum Slope
     Slope_48,
 };
 
+//==============================================================================
 struct ChainSettings
 {
     float peakFreq{ 0 }, peakGainInDecibels{ 0 }, peakQuality{ 1.f };
