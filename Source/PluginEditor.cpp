@@ -203,10 +203,6 @@ ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) :
         param->addListener(this);
     }
     
-    /*
-     48000 / 2048 = 23hz per bin
-     */
-    
     leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
     monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
     
@@ -255,14 +251,44 @@ void ResponseCurveComponent::timerCallback()
         }
     }
     
+    /*
+        If there are FFT data buffers to pull, if we can pull a buffer generate a path
+     */
+    const auto fftBounds = getAnalysisArea().toFloat();
+    const auto fftSize = leftChannelFFTDataGenerator.getFFTSize();
+    
+    /*
+        48000 / 2048 = 23hz bin width
+     */
+    const auto binWidth = audioProcessor.getSampleRate() / (double)fftSize;
+    
+    // While there is FFT data blocks pull and pass
+    while (leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+    {
+        std::vector<float> fftData;
+        if (leftChannelFFTDataGenerator.getFFTData(fftData))
+        {
+            // Add to path producer
+            pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -48.f);
+        }
+    }
+    
+    // While there are paths that can be pulled pull as many as we can
+    while (pathProducer.getNumPathsAvailable())
+    {
+        pathProducer.getPath(leftChannelFFTPath);
+    }
+    
     if (parametersChanged.compareAndSetBool(false, true))
     {
         // Update the monochain
         updateChain();
 
         // Signal a repaint
-        repaint();
+        // repaint();
     }
+    
+    repaint();
 }
 
 void ResponseCurveComponent::updateChain()
@@ -345,6 +371,11 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     {
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
+    
+    // TODO: update this color?
+    // Paint left channel FFT Path
+    g.setColour(Colours::blue);
+    g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
 
     // TODO: update this color
     g.setColour(Colours::orange);
