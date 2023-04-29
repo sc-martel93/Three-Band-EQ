@@ -121,20 +121,7 @@ void LookAndFeel::drawToggleButton (juce::Graphics &g,
         auto bounds = toggleButton.getLocalBounds();
         g.drawRect(bounds);
         
-        auto insetRect = bounds.reduced(4);
-        
-        Path randomPath;
-        
-        Random r;
-        
-        auto yVal = insetRect.getY() + insetRect.getHeight();
-        
-        randomPath.startNewSubPath(insetRect.getX(), yVal  * r.nextFloat());
-        
-        for (auto x = insetRect.getX() + 1; x < insetRect.getRight(); x += 2)
-        {
-            randomPath.lineTo(x, yVal * r.nextFloat());
-        }
+        Path randomPath = analyzerButton->randomPath;
         
         g.strokePath(randomPath, PathStrokeType(1.f));
     }
