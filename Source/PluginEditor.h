@@ -295,12 +295,12 @@ private:
     SimpleEQAudioProcessor& audioProcessor;
 
     RotarySliderWithLabels peakFreqSlider,
-    peakGainSlider,
-    peakQualitySlider,
-    lowCutFreqSlider,
-    highCutFreqSlider,
-    lowCutSlopeSlider,
-    highCutSlopeSlider;
+        peakGainSlider,
+        peakQualitySlider,
+        lowCutFreqSlider,
+        highCutFreqSlider,
+        lowCutSlopeSlider,
+        highCutSlopeSlider;
 
     ResponseCurveComponent responseCurveComponent;
 
@@ -308,13 +308,22 @@ private:
     using Attachment = APVTS::SliderAttachment;
 
     Attachment peakFreqSliderAttachment,
-    peakGainSliderAttachment,
-    peakQualitySliderAttachment,
-    lowCutFreqSliderAttachment,
-    highCutFreqSliderAttachment,
-    lowCutSlopeSliderAttachment,
-    highCutSlopeSliderAttachment;
-
+        peakGainSliderAttachment,
+        peakQualitySliderAttachment,
+        lowCutFreqSliderAttachment,
+        highCutFreqSliderAttachment,
+        lowCutSlopeSliderAttachment,
+        highCutSlopeSliderAttachment;
+    
+    juce::ToggleButton lowCutBypassedButton, peakBypassedButton, highCutBypassedButton, analyzerEnabledButton;
+    
+    using ButtonAttachment = APVTS::ButtonAttachment;
+    
+    ButtonAttachment lowCutBypassedButtonAttachment,
+        peakBypassedButtonAttachment,
+        highCutBypassedButtonAttachment,
+        analyzerEnabledButtonAttachment;
+    
     std::vector<juce::Component*> getComps();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessorEditor)
