@@ -24,13 +24,11 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
     auto enabled = slider.isEnabled();
     
     // Draw rotary ellipse
-    g.setColour(enabled ? Colour(7u, 59u, 76u) : Colours::darkgrey);
+    g.setColour(enabled ? Colour(4u, 19u, 84u) : Colours::darkgrey);
     g.fillEllipse(bounds);
-
-    // TODO: hex colour for response area border #ffd166 or #ef476f
  
     // Draw border of ellipse
-    g.setColour(enabled ? Colour(6u, 214u, 160u) : Colours::grey);
+    g.setColour(enabled ? Colour(4u, 132u, 251u) : Colours::grey);
     g.drawEllipse(bounds, 1.f);
 
     if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
@@ -71,7 +69,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
         g.setColour(enabled ? Colours::black : Colours::darkgrey);
         g.fillRect(r);
 
-        g.setColour(enabled ? Colours::white : Colours::lightgrey);
+        g.setColour(enabled ? Colours::antiquewhite : Colours::lightgrey);
         g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
     }
     
@@ -166,8 +164,8 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto center = sliderBounds.toFloat().getCentre();
     auto radius = sliderBounds.getWidth() * 0.5f;
 
-    // TODO: Change this color??
-    g.setColour(Colour(0u, 172u, 1u));
+    // Slider limit text
+    g.setColour(Colours::antiquewhite);
     g.setFont(getTextHeight());
 
     // Iterate and write all labels
@@ -457,26 +455,25 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
         auto leftChannelFFTPath = leftPathProducer.getPath();
         leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
         
-        // TODO: update this color?
         // Paint left channel FFT Path
-        g.setColour(Colours::skyblue);
+        // (4u, 132u, 251u)
+        g.setColour(Colour(0u, 172u, 1u) );
         g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
         
         auto rightChannelFFTPath = rightPathProducer.getPath();
         rightChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
         
-        // TODO: update this color?
         // Paint right channel FFT Path
-        g.setColour(Colours::yellow);
+        //(4u, 132u, 251u)
+        g.setColour(Colour(0u, 172u, 1u) );
         g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
     }
     
-    // TODO: update this color
     // Spectrum border
-    g.setColour(Colours::orange);
+    g.setColour(Colour(4u, 132u, 251u));
     g.drawRoundedRectangle(getRenderArea().toFloat(), 4.1f, 1.f);
 
-    g.setColour(Colours::white);
+    g.setColour(Colours::antiquewhite);
     g.strokePath(responseCurve, PathStrokeType(2.f));
 }
 
@@ -529,7 +526,7 @@ void ResponseCurveComponent::resized()
     for (auto gDb : gain)
     {
         auto y = jmap(gDb, -24.f, 24.f, float(bottom), float(top));
-        // TODO: Update this color ( Center line of response curve grid)
+        // Center of response curve line
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::darkgrey);
         g.drawHorizontalLine(y, left, right);
     }
@@ -587,7 +584,6 @@ void ResponseCurveComponent::resized()
         r.setX(getWidth() - textWidth);
         r.setCentre(r.getCentreX(), y);
 
-        // TODO: Update this color
         g.setColour(gDb == 0.f ? Colour(0u, 172u, 1u) : Colours::lightgrey);
         g.drawFittedText(str, r, Justification::centred, 1);
 
