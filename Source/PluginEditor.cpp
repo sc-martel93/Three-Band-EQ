@@ -20,14 +20,17 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
 
     auto bounds = Rectangle<float>(x, y, width, height);
 
+    // Set slider colors to grey is disabled
+    auto enabled = slider.isEnabled();
+    
     // Draw rotary ellipse
-    g.setColour(Colour(7u, 59u, 76u));
+    g.setColour(enabled ? Colour(7u, 59u, 76u) : Colours::darkgrey);
     g.fillEllipse(bounds);
 
     // TODO: hex colour for response area border #ffd166 or #ef476f
  
     // Draw border of ellipse
-    g.setColour(Colour(6u, 214u, 160u));
+    g.setColour(enabled ? Colour(6u, 214u, 160u) : Colours::grey);
     g.drawEllipse(bounds, 1.f);
 
     if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
@@ -678,6 +681,41 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor(SimpleEQAudioProcesso
     peakBypassedButton.setLookAndFeel(&lnf);
     highCutBypassedButton.setLookAndFeel(&lnf);
     analyzerEnabledButton.setLookAndFeel(&lnf);
+    
+    auto safePtr = juce::Component::SafePointer<SimpleEQAudioProcessorEditor>(this);
+    peakBypassedButton.onClick = [safePtr]()
+    {
+        if (auto* comp = safePtr.getComponent())
+        {
+            auto bypassed = comp->peakBypassedButton.getToggleState();
+            
+            comp->peakFreqSlider.setEnabled(!bypassed);
+            comp->peakGainSlider.setEnabled(!bypassed);
+            comp->peakQualitySlider.setEnabled(!bypassed);
+        }
+    };
+    
+    lowCutBypassedButton.onClick = [safePtr]()
+    {
+        if (auto* comp = safePtr.getComponent())
+        {
+            auto bypassed = comp->lowCutBypassedButton.getToggleState();
+            
+            comp->lowCutFreqSlider.setEnabled(!bypassed);
+            comp->lowCutSlopeSlider.setEnabled(!bypassed);
+        }
+    };
+    
+    highCutBypassedButton.onClick = [safePtr]()
+    {
+        if (auto* comp = safePtr.getComponent())
+        {
+            auto bypassed = comp->highCutBypassedButton.getToggleState();
+            
+            comp->highCutFreqSlider.setEnabled(!bypassed);
+            comp->highCutSlopeSlider.setEnabled(!bypassed);
+        }
+    };
     
     setSize (600, 480);
 }
