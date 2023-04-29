@@ -372,9 +372,12 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
     
+    // Translate fft path to bounding box origin
+    leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+    
     // TODO: update this color?
     // Paint left channel FFT Path
-    g.setColour(Colours::blue);
+    g.setColour(Colours::skyblue);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
 
     // TODO: update this color
