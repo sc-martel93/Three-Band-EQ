@@ -117,7 +117,7 @@ void LookAndFeel::drawToggleButton (juce::Graphics &g,
     }
     else if (auto* analyzerButton = dynamic_cast<AnalyzerButton*>(&toggleButton))
     {
-        auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(0u, 172u, 1u);
+        auto color = toggleButton.getToggleState() ?  Colour(0u, 172u, 1u) : Colours::dimgrey;
         
         g.setColour(color);
         
