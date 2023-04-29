@@ -213,38 +213,20 @@ private:
     juce::String suffix;
 };
 
-// Response Curve Component
-struct ResponseCurveComponent : juce::Component,
-    juce::AudioProcessorParameter::Listener,
-    juce::Timer
+
+struct PathProducer
 {
-public:
-    ResponseCurveComponent(SimpleEQAudioProcessor&);
-    ~ResponseCurveComponent();
-
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override { };
-
-    void timerCallback() override;
-
-    void paint(juce::Graphics& g) override;
-    void resized() override;
-
-private:
-    SimpleEQAudioProcessor& audioProcessor;
-    juce::Atomic<bool> parametersChanged{ false };
-
-    MonoChain monoChain;
-
-    void updateChain();
-
-    // Response curve grid image
-    juce::Image background;
-
-    juce::Rectangle<int> getRenderArea();
-
-    juce::Rectangle<int> getAnalysisArea();
+    PathProducer(SingleChannelSampleFifo<SimpleEQAudioProcessor::BlockType>& scsf) :
+    leftChannelFifo(&scsf)
+    {
+        leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
+        monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
+    };
     
+    void process(juce::Rectangle<float> fftBounds, double sampleRate);
+    juce::Path getPath() { return leftChannelFFTPath; };
+    
+private:
     // Spectrum analyzer
     SingleChannelSampleFifo<SimpleEQAudioProcessor::BlockType>* leftChannelFifo;
     
@@ -255,6 +237,43 @@ private:
     AnalyzerPathGenerator<juce::Path> pathProducer;
     
     juce::Path leftChannelFFTPath;
+
+};
+
+// Response Curve Component
+struct ResponseCurveComponent : juce::Component,
+    juce::AudioProcessorParameter::Listener,
+    juce::Timer
+{
+public:
+    ResponseCurveComponent(SimpleEQAudioProcessor&);
+    ~ResponseCurveComponent();
+    
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override { };
+    
+    void timerCallback() override;
+    
+    void paint(juce::Graphics& g) override;
+    void resized() override;
+    
+private:
+    SimpleEQAudioProcessor& audioProcessor;
+    juce::Atomic<bool> parametersChanged{ false };
+    
+    MonoChain monoChain;
+    
+    void updateChain();
+    
+    // Response curve grid image
+    juce::Image background;
+    
+    juce::Rectangle<int> getRenderArea();
+    
+    juce::Rectangle<int> getAnalysisArea();
+    
+    PathProducer leftPathProducer, rightPathProducer;
+    
 };
 
 //==============================================================================
