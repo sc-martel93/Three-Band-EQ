@@ -1,6 +1,6 @@
-# SimpleEQ
+# Three Band EQ
 Created by Scott Martel using C++ and the JUCE framework
 
-SimpleEQ is a 3-band equalizer that provides a straightforward, yet powerful way to shape your sound. 
+Three Band Equalizer is a user-friendly, C++ and JUCE framework-based audio plugin with real-time feedback, suitable for professionals and beginners in various digital audio workstations."
 
 
